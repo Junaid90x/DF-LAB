@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infographic: Global Digital Forensics & eDiscovery Landscape</title>
+    <!-- Chosen Palette: Brilliant Blues (#0044cc, #0055ff, #3377ff, #6699ff, #99bbff) - Selected for its professional, high-tech, and vibrant feel, which aligns with the state-of-the-art nature of a digital forensics laboratory. -->
+    <!-- Narrative Plan: The infographic tells a linear story starting with the 'Why' (the imperative for a lab), moving to the 'What' (the core components of the blueprint), the 'How' (the operational process), the 'Where' (the Indian context and key players), and finally the 'Strategy' (the implementation plan). This structure guides the user from the high-level strategic need down to actionable recommendations, making complex information digestible in a single-page narrative. -->
+    <!-- Visualization Choices:
+        - Global Lab Focus Areas -> Goal: Inform/Compare -> Viz: Bar Chart (Chart.js/Canvas) -> Justification: Clearly visualizes the emphasis on different aspects across international academic labs.
+        - Key eDiscovery Platforms (Relativity, Nuix) -> Goal: Compare -> Viz: HTML Table -> Justification: Ideal for a direct, feature-by-feature comparison of two leading foreign tech firms.
+        - Pioneering Corporate & Government Labs -> Goal: Inform -> Viz: Icon-based Cards (Unicode) -> Justification: Highlights specific foreign institutions with key achievements.
+        - Collaboration Models -> Goal: Organize -> Viz: Icon-based Cards (Unicode) -> Justification: Presents different foreign-centric partnership frameworks clearly.
+        - All visualizations use Canvas or HTML/CSS, adhering to the NO SVG/Mermaid requirement. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .chart-container { position: relative; width: 100%; max-width: 700px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) {.chart-container { height: 400px; } }
+        .kpi-card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); padding: 1.5rem; transition: transform 0.3s ease, box-shadow 0.3s ease; border-left: 4px solid #0055ff; }
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .section-title::after { content: ''; display: block; width: 60px; height: 4px; background-color: #0055ff; margin-top: 0.75rem; border-radius: 2px; }
+        .section-title.center::after { margin-left: auto; margin-right: auto; }
+        .flow-step { position: relative; padding: 1.5rem; background-color: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); text-align: center; }
+        .flow-arrow { display: none; }
+        @media (min-width: 768px) {
+            .flow-arrow { display: block; position: absolute; top: 50%; right: -2rem; transform: translateY(-50%); font-size: 2rem; color: #99bbff; }
+        }
+        .timeline-item { position: relative; padding-left: 2.5rem; padding-bottom: 2rem; border-left: 2px solid #6699ff; }
+        .timeline-item:last-child { border-left: 2px solid transparent; }
+        .timeline-dot { position: absolute; left: -0.7rem; top: 0.1rem; height: 1.25rem; width: 1.25rem; background-color: #0055ff; border-radius: 9999px; border: 4px solid #f8fafc; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            line-height: 1;
+            padding: 0 8px;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0055ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-[#0044cc]">Global Forensics Insights</h1>
+            <div class="hidden md:flex space-x-6 text-sm font-semibold">
+                <a href="#academic" class="hover:text-[#0055ff]">Academic Excellence</a>
+                <a href="#technology" class="hover:text-[#0055ff]">Leading Tech</a>
+                <a href="#pioneering" class="hover:text-[#0055ff]">Pioneering Labs</a>
+                <a href="#collaboration" class="hover:text-[#0055ff]">Collaboration Models</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="hero" class="text-center mb-20">
+            <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight text-[#0044cc]">Navigating the Global Digital Forensics Landscape</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Understanding international best practices, leading technologies, and successful collaboration models is crucial for establishing a world-class Digital Forensics and eDiscovery Laboratory.</p>
+        </section>
+
+        <section id="academic" class="mb-20 scroll-mt-20">
+            <div class="text-center">
+                <h3 class="section-title center text-3xl font-bold inline-block">Global Academic Excellence</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-slate-600">Leading universities worldwide are at the forefront of digital forensics education and research, often specializing in emerging areas and fostering strong industry ties.</p>
+            </div>
+
+            <div class="mt-12 bg-white p-8 rounded-lg shadow-lg">
+                <h4 class="text-xl font-semibold text-center mb-2">Key Focus Areas of International University Labs</h4>
+                <p class="text-center text-slate-600 mb-6">These institutions emphasize practical skills, cutting-edge research, and real-world application, providing a blueprint for comprehensive programs.</p>
+                 <div class="chart-container">
+                    <canvas id="globalLabFocusChart"></canvas>
+                </div>
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="kpi-card p-4" data-lab-name="London Metropolitan University" data-lab-desc="Advanced training in digital forensics, cybersecurity, and applied AI, with pioneering projects in IoT and cloud forensics.">
+                        <h5 class="font-bold">🇬🇧 London Metropolitan University</h5>
+                        <p class="text-sm text-slate-600 mt-1">Advanced training in digital forensics, cybersecurity, and applied AI, with pioneering projects in IoT and cloud forensics.</p>
+                        <button class="llm-elaborate-button bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold py-1 px-2 rounded-full mt-2">
+                            ✨ Elaborate Profile
+                        </button>
+                    </div>
+                    <div class="kpi-card p-4" data-lab-name="Wharton Forensic Analytics Lab" data-lab-desc="Specializes in financial forensics, white-collar crime, and insider trading, leveraging big data analytics.">
+                        <h5 class="font-bold">🇺🇸 Wharton Forensic Analytics Lab</h5>
+                        <p class="text-sm text-slate-600 mt-1">Specializes in financial forensics, white-collar crime, and insider trading, leveraging big data analytics.</p>
+                        <button class="llm-elaborate-button bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold py-1 px-2 rounded-full mt-2">
+                            ✨ Elaborate Profile
+                        </button>
+                    </div>
+                    <div class="kpi-card p-4" data-lab-name="Florida International University (FIU)" data-lab-desc="Hosts the FINDS Research Center of Excellence, focusing on AI-powered digital forensics and workforce development.">
+                        <h5 class="font-bold">🇺🇸 Florida International University (FIU)</h5>
+                        <p class="text-sm text-slate-600 mt-1">Hosts the FINDS Research Center of Excellence, focusing on AI-powered digital forensics and workforce development.</p>
+                        <button class="llm-elaborate-button bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold py-1 px-2 rounded-full mt-2">
+                            ✨ Elaborate Profile
+                        </button>
+                    </div>
+                    <div class="kpi-card p-4" data-lab-name="University of Technology Sydney (UTS)" data-lab-desc="Offers Australia's first Digital Forensics major, with an industry-informed curriculum and world-class tech labs.">
+                        <h5 class="font-bold">🇦🇺 University of Technology Sydney (UTS)</h5>
+                        <p class="text-sm text-slate-600 mt-1">Offers Australia's first Digital Forensics major, with an industry-informed curriculum and world-class tech labs.</p>
+                        <button class="llm-elaborate-button bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold py-1 px-2 rounded-full mt-2">
+                            ✨ Elaborate Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="technology" class="mb-20 scroll-mt-20">
+             <div class="text-center">
+                <h3 class="section-title center text-3xl font-bold inline-block">Industry-Leading Technologies</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-slate-600">Global leaders in eDiscovery and digital investigations, Relativity and Nuix, offer powerful platforms and dedicated academic support.</p>
+            </div>
+            
+            <div class="mt-12 bg-white p-8 rounded-lg shadow-lg">
+                <h4 class="text-xl font-semibold text-center mb-6">Key Features: Relativity vs. Nuix</h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feature Category</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relativity</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nuix</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Core Functionality</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">Comprehensive eDiscovery review, data management (Legal Hold, Collect, Processing), advanced searching, redaction, production.</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">Reimagined eDiscovery with highly automated workflows, industry-leading processing (1000+ file types), rapid review.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">AI/Advanced Analytics</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">Analytics, Review Center, Clustering, Email Threading, Language ID, Sentiment Analysis, TAR with Active Learning, aiR for Case Strategy/Privilege/Review.</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">Proprietary responsible Cognitive AI (CogAI), 500+ pre-built eDiscovery models, AI-enhanced review, CAL, data mining, predictive coding, semantic search, AI-assisted redaction/summarization.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Academic Support</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">Dedicated Academic Program: access to curricula & software for professors. Free/discounted certification exams.</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">Academic Support: software & training for academic staff. 50% discount for students/teachers/institutions. 20% government training vouchers.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Certifications</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">RCA, Specialist (Analytics, Processing, Project Management, Review Management), Pro.</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">Nuix Neo, Nuix Workstation, Nuix Investigate®, Nuix Discover®, Nuix Master.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="pioneering" class="mb-20 scroll-mt-20">
+            <div class="text-center">
+                <h3 class="section-title center text-3xl font-bold inline-block">Pioneering Corporate & Government Labs</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-slate-600">These labs set industry standards for forensic processes, technological capabilities, and rigorous accreditation.</p>
+            </div>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="kpi-card">
+                    <div class="text-4xl mb-3">🇺🇸</div>
+                    <h4 class="font-bold text-xl">DoD Cyber Crime Center (DC3)</h4>
+                    <p class="mt-2 text-slate-600 text-sm">Provides comprehensive Digital & Multimedia (D/MM) forensic examinations and malware analysis. ISO 17025 accredited.</p>
+                </div>
+                <div class="kpi-card">
+                    <div class="text-4xl mb-3">�🇸</div>
+                    <h4 class="font-bold text-xl">CACI Digital Forensics Laboratory (CDFL)</h4>
+                    <p class="mt-2 text-slate-600 text-sm">Internationally accredited full-service lab for computer, mobile, and audio/video forensics. Holds ISO/IEC 17025, 27001, 20000-1, NIST 800-171, and CJIS compliance.</p>
+                </div>
+                <div class="kpi-card">
+                    <div class="text-4xl mb-3">🇪🇺</div>
+                    <h4 class="font-bold text-xl">European Digital Forensic Lab (EDFL)</h4>
+                    <p class="mt-2 text-slate-600 text-sm">Focuses on identifying and explaining disinformation, documenting human rights abuses, and building digital resilience through open-source research.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="collaboration" class="mb-20 scroll-mt-20">
+            <div class="text-center">
+                <h3 class="section-title center text-3xl font-bold inline-block">Models for Global Collaboration</h3>
+                <p class="mt-4 max-w-2xl mx-auto text-slate-600">Successful international partnerships offer blueprints for fostering innovation, talent development, and shared expertise.</p>
+            </div>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg">🤝 Industry-University Cooperative Research Centers (IUCRC)</h4>
+                    <p class="mt-2 text-slate-600">A proven model (e.g., University of South Alabama) where industry members pay annual fees to fund pre-competitive research guided by an Industrial Advisory Board, with structured IP sharing.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="font-bold text-lg">🌐 US-India Cyberspace Cooperation</h4>
+                    <p class="mt-2 text-slate-600">A deepening strategic partnership focused on cybersecurity infrastructure, technological innovation, and the digital economy, with joint initiatives to address cyber threats.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md col-span-full">
+                    <h4 class="font-bold text-lg">🎓 Academic Programs by Tech Vendors</h4>
+                    <p class="mt-2 text-slate-600">Companies like Relativity and Nuix offer direct access to their software, curricula, training, and certifications to universities, fostering a talent pipeline proficient in industry-standard tools.</p>
+                </div>
+            </div>
+            <div class="flex justify-center mt-6">
+                <button id="suggestGlobalResearchButton" class="bg-[#0055ff] hover:bg-[#0044cc] text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300">
+                    ✨ Suggest Global Research Areas
+                </button>
+            </div>
+        </section>
+
+        <section id="conclusion" class="text-center">
+            <h3 class="section-title center text-3xl font-bold inline-block">Strategic Path Forward</h3>
+            <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">Leveraging insights from these global leaders and fostering international partnerships will enable Amity University Bengaluru to establish a truly world-class Digital Forensics and eDiscovery Laboratory, preparing graduates for the evolving global cybersecurity landscape.</p>
+        </section>
+
+    </main>
+    
+    <footer class="bg-slate-800 text-white">
+        <div class="container mx-auto py-6 px-6 text-center text-sm">
+            <p>&copy; 2025 Global Digital Forensics & eDiscovery Infographic</p>
+            <p class="text-slate-400 mt-1">Synthesized from global research for strategic planning.</p>
+        </div>
+    </footer>
+
+    <!-- LLM Modal Structure -->
+    <div id="llmModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button" id="closeLlmModal">&times;</span>
+            <h3 id="llmModalTitle" class="text-2xl font-bold text-[#0044cc] mb-4"></h3>
+            <div id="llmModalBody" class="text-slate-800 whitespace-pre-wrap leading-relaxed"></div>
+            <div id="llmLoadingSpinner" class="loading-spinner hidden"></div>
+            <button id="copyLlmButton" class="bg-[#0055ff] hover:bg-[#0044cc] text-white font-bold py-2 px-4 rounded-lg mt-6 shadow-md transition duration-300 hidden">Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const tooltipCallback = {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) { return label.join(' '); }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            };
+            
+            function wrapLabel(str, maxWidth) {
+                if (!str || str.length <= maxWidth) return str;
+                const words = str.split(' ');
+                let lines = [];
+                let currentLine = words[0];
+                for (let i = 1; i < words.length; i++) {
+                    if ((currentLine + ' ' + words[i]).length > maxWidth) {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    } else {
+                        currentLine += ' ' + words[i];
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            }
+
+            const globalLabFocusCtx = document.getElementById('globalLabFocusChart')?.getContext('2d');
+            if(globalLabFocusCtx) {
+                new Chart(globalLabFocusCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            'Hands-on Learning & Real-World Cases',
+                            'AI & Advanced Research Integration',
+                            'Industry & Government Collaboration',
+                            'Specialized Research Tracks (e.g., IoT, Cloud, Finance)',
+                            'Accreditation & Professional Certification Focus'
+                        ].map(l => wrapLabel(l, 20)),
+                        datasets: [{
+                            label: 'Emphasis in Leading Global University Labs',
+                            data: [90, 85, 80, 75, 70],
+                            backgroundColor: ['#0055ff', '#3377ff', '#6699ff', '#99bbff', '#0044cc'],
+                            borderColor: 'rgba(255, 255, 255, 0)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Level of Emphasis (%)', color: '#475569' },
+                                grid: { color: '#e2e8f0' },
+                                ticks: {
+                                    callback: function(value) { return value + "%" }
+                                }
+                            },
+                            y: {
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                ...tooltipCallback.plugins.tooltip,
+                                backgroundColor: '#0044cc',
+                                titleFont: { weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                callbacks: {
+                                    ...tooltipCallback.plugins.tooltip.callbacks,
+                                    label: function(context) {
+                                        return ` Emphasis: ${context.parsed.x}%`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // LLM Integration Logic
+            const llmModal = document.getElementById('llmModal');
+            const closeLlmModalButton = document.getElementById('closeLlmModal');
+            const llmModalTitle = document.getElementById('llmModalTitle');
+            const llmModalBody = document.getElementById('llmModalBody');
+            const llmLoadingSpinner = document.getElementById('llmLoadingSpinner');
+            const copyLlmButton = document.getElementById('copyLlmButton');
+
+            function showLlmModal(title, content) {
+                llmModalTitle.textContent = title;
+                llmModalBody.textContent = content;
+                llmLoadingSpinner.classList.add('hidden');
+                copyLlmButton.classList.remove('hidden');
+                llmModal.classList.remove('hidden');
+                llmModal.style.display = 'flex'; /* Ensure flex display for centering */
+            }
+
+            function showLlmLoading(title) {
+                llmModalTitle.textContent = title;
+                llmModalBody.textContent = '';
+                copyLlmButton.classList.add('hidden');
+                llmLoadingSpinner.classList.remove('hidden');
+                llmModal.classList.remove('hidden');
+                llmModal.style.display = 'flex'; /* Ensure flex display for centering */
+            }
+
+            function hideLlmModal() {
+                llmModal.classList.add('hidden');
+                llmModal.style.display = 'none';
+            }
+
+            closeLlmModalButton.onclick = hideLlmModal;
+            window.onclick = function(event) {
+                if (event.target == llmModal) {
+                    hideLlmModal();
+                }
+            };
+
+            copyLlmButton.onclick = function() {
+                const textToCopy = llmModalBody.textContent;
+                const textArea = document.createElement("textarea");
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyLlmButton.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyLlmButton.textContent = 'Copy to Clipboard';
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+                document.body.removeChild(textArea);
+            };
+
+            // Elaborate on Lab Profile Button
+            document.querySelectorAll('.llm-elaborate-button').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const labName = button.closest('.kpi-card').dataset.labName;
+                    const labDesc = button.closest('.kpi-card').dataset.labDesc;
+
+                    showLlmLoading(`Generating profile for ${labName}...`);
+
+                    let chatHistory = [];
+                    const prompt = `Provide a more detailed profile of the digital forensics program or lab at ${labName}. Include their specific areas of expertise, unique features, and notable contributions to the field. Focus on an academic context suitable for a university looking to establish a lab. Their brief description is: "${labDesc}".`;
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const result = await response.json();
+                        if (result.candidates && result.candidates.length > 0 &&
+                            result.candidates[0].content && result.candidates[0].content.parts &&
+                            result.candidates[0].content.parts.length > 0) {
+                            const text = result.candidates[0].content.parts[0].text;
+                            showLlmModal(`Profile: ${labName}`, text);
+                        } else {
+                            showLlmModal('Error', `Could not generate a profile for ${labName}. Please try again.`);
+                        }
+                    } catch (error) {
+                        console.error(`Error fetching profile for ${labName}:`, error);
+                        showLlmModal('Error', 'Failed to connect to the generation service. Please check your network and try again.');
+                    }
+                });
+            });
+
+            // Suggest Global Research Areas Button
+            document.getElementById('suggestGlobalResearchButton').addEventListener('click', async () => {
+                showLlmLoading('Suggesting Global Research Areas...');
+                let chatHistory = [];
+                const prompt = "Suggest 3-5 interdisciplinary research areas in digital forensics and eDiscovery where an Indian university could effectively collaborate with international academic, corporate, or government labs. Focus on emerging technologies (e.g., AI, blockchain, IoT, cloud), cross-border crime, or policy implications. Provide a brief (1-2 sentence) justification for each area's global relevance.";
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        showLlmModal('Suggested Global Research Collaboration Areas', text);
+                    } else {
+                        showLlmModal('Error', 'Could not suggest global research areas. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error fetching global research areas:', error);
+                    showLlmModal('Error', 'Failed to connect to the generation service. Please check your network and try again.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+�
